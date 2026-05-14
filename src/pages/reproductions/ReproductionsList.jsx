@@ -1,14 +1,17 @@
 import { Link } from "react-router-dom";
-import { MOCK_REPRODUCTIONS } from "../../data/mockData";
+
+import { useVoliere } from "../../context/VoliereDataContext";
 
 export const ReproductionsList = () => {
+  const { reproductions } = useVoliere();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Reproductions</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Suivi des pontes et couvées (données fictives).
+            Suivi des pontes et couvées (Firestore).
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -42,7 +45,7 @@ export const ReproductionsList = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {MOCK_REPRODUCTIONS.map((r) => (
+              {reproductions.map((r) => (
                 <tr key={r.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium text-gray-900">
                     {r.coupleNom}

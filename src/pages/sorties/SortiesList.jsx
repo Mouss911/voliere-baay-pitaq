@@ -1,4 +1,4 @@
-import { MOCK_SORTIES_CHEPTEL } from "../../data/mockData";
+import { useVoliere } from "../../context/VoliereDataContext";
 
 const labels = {
   vente: "Vente",
@@ -13,9 +13,10 @@ const badgeClass = {
 };
 
 export const SortiesList = () => {
-  const ventes = MOCK_SORTIES_CHEPTEL.filter((s) => s.type === "vente");
-  const deces = MOCK_SORTIES_CHEPTEL.filter((s) => s.type === "deces");
-  const pertes = MOCK_SORTIES_CHEPTEL.filter((s) => s.type === "perte");
+  const { sorties } = useVoliere();
+  const ventes = sorties.filter((s) => s.type === "vente");
+  const deces = sorties.filter((s) => s.type === "deces");
+  const pertes = sorties.filter((s) => s.type === "perte");
 
   return (
     <div className="space-y-8">
@@ -23,14 +24,12 @@ export const SortiesList = () => {
         <h1 className="text-2xl font-bold text-gray-900">Sorties du cheptel</h1>
         <p className="mt-2 max-w-3xl text-sm text-gray-600">
           Conformément au cahier de validation : une <strong>sortie</strong> retire
-          le pigeon de l’effectif actif (vente, décès ou perte). L’historique reste
-          consultable ; le pigeon ne doit plus apparaître dans les cages occupées
-          une fois la sortie enregistrée (ici : exemples statiques + liste
-          pigeons avec statuts vendu / mort).
+          le pigeon de l’effectif actif (vente, décès ou perte). Les entrées
+          affichées proviennent de Firestore.
         </p>
       </div>
 
-      <SectionTable title="Ventes" rows={ventes} empty="Aucune vente fictive." />
+      <SectionTable title="Ventes" rows={ventes} empty="Aucune vente enregistrée." />
       <SectionTable title="Décès" rows={deces} empty="Aucun décès enregistré." />
       <SectionTable title="Pertes" rows={pertes} empty="Aucune perte enregistrée." />
     </div>
@@ -65,9 +64,9 @@ function SectionTable({ title, rows, empty }) {
                   </td>
                   <td className="px-4 py-3 sm:px-6">
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${badgeClass[s.type]}`}
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${badgeClass[s.type] ?? "bg-gray-100 text-gray-800"}`}
                     >
-                      {labels[s.type]}
+                      {labels[s.type] ?? s.type}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-gray-600 sm:px-6">{s.detail}</td>

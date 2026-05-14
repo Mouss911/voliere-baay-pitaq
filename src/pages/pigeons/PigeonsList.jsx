@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { MOCK_PIGEONS } from "../../data/mockData";
+
+import { useVoliere } from "../../context/VoliereDataContext";
 
 function badgeStatut(statut) {
   const map = {
@@ -14,14 +15,16 @@ function badgeStatut(statut) {
 }
 
 export default function PigeonsList() {
+  const { pigeons } = useVoliere();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Pigeons</h1>
           <p className="mt-1 text-sm text-gray-500">
-            CRUD fictif — statuts conformes au sujet (dont vente / décès = sortie du
-            cheptel ; suppression logique si descendance).
+            Liste synchronisée avec Firestore — création et modification
+            enregistrées côté cloud.
           </p>
         </div>
         <Link
@@ -47,7 +50,7 @@ export default function PigeonsList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {MOCK_PIGEONS.map((p) => (
+              {pigeons.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium text-gray-900">
                     {p.bague}

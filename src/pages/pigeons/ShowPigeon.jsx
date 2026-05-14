@@ -1,15 +1,17 @@
 import { Link, useParams } from "react-router-dom";
-import { getPigeonById } from "../../data/mockData";
+
+import { useVoliere } from "../../context/VoliereDataContext";
 
 export const ShowPigeon = () => {
   const { id } = useParams();
+  const { getPigeonById } = useVoliere();
   const pigeon = getPigeonById(id);
 
   if (!pigeon) {
     return (
       <div className="space-y-4">
         <h1 className="text-2xl font-bold text-gray-900">Pigeon introuvable</h1>
-        <p className="text-gray-600">Aucune fiche fictive pour l’identifiant « {id} ».</p>
+        <p className="text-gray-600">Aucune fiche pour l’identifiant « {id} ».</p>
         <Link to="/pigeons" className="text-green-600 hover:text-green-700">
           Retour à la liste
         </Link>
@@ -28,11 +30,11 @@ export const ShowPigeon = () => {
             ← Liste des pigeons
           </Link>
           <h1 className="mt-2 text-2xl font-bold text-gray-900">{pigeon.bague}</h1>
-          <p className="text-sm text-gray-500">Fiche fictive #{pigeon.id}</p>
+          <p className="text-sm text-gray-500">Fiche Firestore #{pigeon.id}</p>
           {["Vendu", "Mort", "Perdu"].includes(pigeon.statut) ? (
             <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-              Sortie du cheptel enregistrée (cahier DTS) : ce pigeon ne doit plus
-              occuper de cage ; la fiche reste consultable pour la traçabilité.
+              Sortie du cheptel : ce pigeon ne doit plus occuper de cage ; la fiche
+              reste consultable pour la traçabilité.
             </p>
           ) : null}
         </div>

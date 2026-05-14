@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
-import { MOCK_GENEALOGY } from "../../data/mockData";
+
+import { useVoliere } from "../../context/VoliereDataContext";
 
 export const Genealogy = () => {
+  const { genealogy } = useVoliere();
+
   return (
     <div className="space-y-6">
       <div>
@@ -13,15 +16,15 @@ export const Genealogy = () => {
         </Link>
         <h1 className="mt-3 text-2xl font-bold text-gray-900">Généalogie</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Parents, grands-parents et descendance (exigence : connaître les parents
-          d’un pigeon, et les jeunes issus des portées).
+          Parents, grands-parents et descendance — données stockées dans
+          Firestore.
         </p>
       </div>
 
       <div className="space-y-6">
-        {MOCK_GENEALOGY.map((g) => (
+        {genealogy.map((g) => (
           <section
-            key={g.sujet}
+            key={g.sujet ?? g.id}
             className="overflow-x-auto rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
           >
             <h2 className="text-lg font-semibold text-gray-900">

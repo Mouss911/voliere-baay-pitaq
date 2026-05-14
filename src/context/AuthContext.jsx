@@ -2,50 +2,74 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
+
+import { auth } from "../firebase/config";
 
 const AuthContext = createContext(null);
 
-const STORAGE_KEY = "voliere_baay_pitaq_demo_user";
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    try {
-      const raw = sessionStorage.getItem(STORAGE_KEY);
-      if (!raw) return null;
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = useCallback((email) => {
-    const trimmed = email?.trim();
-    if (!trimmed) return false;
-    const u = {
-      email: trimmed,
-      nom: "Thiémokho (Baay Pitàq)",
-    };
-    setUser(u);
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(u));
-    return true;
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (fbUser) => {
+      if (fbUser) {
+        setUser({
+          uid: fbUser.uid,
+          email: fbUser.email ?? "",
+          nom:
+            fbUser.displayName?.trim() ||
+            (fbUser.email ? fbUser.email.split("@")[0] : ""),
+        });
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+    return () => unsub();
   }, []);
 
-  const logout = useCallback(() => {
-    setUser(null);
-    sessionStorage.removeItem(STORAGE_KEY);
+  const login = useCallback(async (email, password) => {
+    await signInWithEmailAndPassword(auth, email.trim(), password);
+  }, []);
+
+  const register = useCallback(async (email, password, displayName) => {
+    const cred = await createUserWithEmailAndPassword(
+      auth,
+      email.trim(),
+      password
+    );
+    const name = displayName?.trim();
+    if (name && cred.user) {
+      await updateProfile(cred.user, { displayName: name });
+    }
+  }, []);
+
+  const logout = useCallback(async () => {
+    await signOut(auth);
   }, []);
 
   const value = useMemo(
     () => ({
       user,
+      loading,
       login,
+      register,
       logout,
       isAuthenticated: Boolean(user),
     }),
-    [user, login, logout]
+    [user, loading, login, register, logout]
   );
 
   return (
@@ -53,7 +77,6 @@ export function AuthProvider({ children }) {
   );
 }
 
-/** @returns {{ user: object | null, login: (email: string) => boolean, logout: () => void, isAuthenticated: boolean }} */
 // eslint-disable-next-line react-refresh/only-export-components -- hook lié au provider
 export function useAuth() {
   const ctx = useContext(AuthContext);

@@ -1,11 +1,6 @@
 import { Link } from "react-router-dom";
-import {
-  MOCK_PIGEONS,
-  MOCK_COUPLES,
-  MOCK_CAGES,
-  MOCK_SORTIES_CHEPTEL,
-  INITIAL_VOLIERE_CAGES,
-} from "../../data/mockData";
+
+import { useVoliere } from "../../context/VoliereDataContext";
 
 const labelsType = {
   vente: "Vente",
@@ -26,13 +21,18 @@ function StatCard({ label, value, hint }) {
 }
 
 export default function Dashboard() {
-  const pigeonsActifs = MOCK_PIGEONS.filter((p) =>
+  const { pigeons, couples, cages, cagesList, sorties } = useVoliere();
+
+  const pigeonsActifs = pigeons.filter((p) =>
     ["Actif", "Jeune", "Repos"].includes(p.statut)
   ).length;
-  const cagesLibres = INITIAL_VOLIERE_CAGES.filter(
-    (c) => c.typeOccupation === "libre"
-  ).length;
-  const derniereSortie = MOCK_SORTIES_CHEPTEL[0];
+
+  const cagesLibres = cages.filter((c) => c.typeOccupation === "libre").length;
+
+  const sortiesTri = [...sorties].sort((a, b) =>
+    String(b.date).localeCompare(String(a.date))
+  );
+  const derniereSortie = sortiesTri[0];
 
   return (
     <div className="space-y-8">
@@ -41,29 +41,28 @@ export default function Dashboard() {
           Tableau de bord — Baay Pitàq
         </h1>
         <p className="mt-2 text-gray-600">
-          Aperçu quotidien de la volière (données fictives, conformes au sujet de
-          validation DTS : pigeons, couples, reproductions, cages, sorties
-          cheptel et visualisation).
+          Aperçu quotidien de la volière. Les chiffres proviennent de Cloud
+          Firestore (votre compte).
         </p>
       </div>
 
       <div
-        className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
         role="status"
       >
-        Données de démonstration : à brancher sur une API + base de données pour
-        la soutenance.
+        Données synchronisées en temps réel avec Firebase. La première connexion
+        importe un jeu de démonstration dans votre espace.
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Pigeons actifs / jeunes" value={pigeonsActifs} />
         <StatCard
-          label="Couples (liste fictive)"
-          value={MOCK_COUPLES.filter((c) => c.statut !== "Dissous").length}
+          label="Couples actifs"
+          value={couples.filter((c) => c.statut !== "Dissous").length}
         />
         <StatCard
           label="Cages libres / total"
-          value={`${cagesLibres} / ${MOCK_CAGES.length}`}
+          value={`${cagesLibres} / ${cagesList.length}`}
         />
         <StatCard
           label="Dernière sortie cheptel"
@@ -88,7 +87,7 @@ export default function Dashboard() {
             </Link>
           </div>
           <ul className="divide-y divide-gray-100">
-            {MOCK_COUPLES.slice(0, 3).map((c) => (
+            {couples.slice(0, 3).map((c) => (
               <li key={c.id} className="flex items-center justify-between py-3">
                 <div>
                   <p className="font-medium text-gray-900">{c.nom}</p>
@@ -117,19 +116,22 @@ export default function Dashboard() {
             </Link>
           </div>
           <p className="text-sm text-gray-600">
-            Consultez la grille des 20 cages (vert / rouge / orange) et testez
-            l’affectation ou la libération sans recharger la page.
+            Consultez la grille des cages et gérez les affectations ; les
+            changements sont enregistrés dans Firestore.
           </p>
           <ul className="mt-4 divide-y divide-gray-100">
-            {MOCK_CAGES.filter((c) => c.typeOccupation !== "libre").slice(0, 4).map((c) => (
-              <li key={c.id} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-medium text-gray-900">{c.numero}</p>
-                  <p className="text-sm text-gray-500">{c.occupation}</p>
-                </div>
-                <span className="text-xs text-gray-500">{c.superficieM2} m²</span>
-              </li>
-            ))}
+            {cagesList
+              .filter((c) => c.typeOccupation !== "libre")
+              .slice(0, 4)
+              .map((c) => (
+                <li key={c.id} className="flex items-center justify-between py-3">
+                  <div>
+                    <p className="font-medium text-gray-900">{c.numero}</p>
+                    <p className="text-sm text-gray-500">{c.occupation}</p>
+                  </div>
+                  <span className="text-xs text-gray-500">{c.superficieM2} m²</span>
+                </li>
+              ))}
           </ul>
         </section>
       </div>

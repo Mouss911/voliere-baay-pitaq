@@ -1,11 +1,12 @@
-import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getCoupleById } from "../../data/mockData";
+import toast from "react-hot-toast";
+
+import { useVoliere } from "../../context/VoliereDataContext";
 
 export const ShowCouple = () => {
   const { id } = useParams();
+  const { getCoupleById, updateCouple } = useVoliere();
   const couple = getCoupleById(id);
-  const [rompu, setRompu] = useState(false);
 
   if (!couple) {
     return (
@@ -18,7 +19,16 @@ export const ShowCouple = () => {
     );
   }
 
-  const estDissous = couple.statut === "Dissous" || rompu;
+  const estDissous = couple.statut === "Dissous";
+
+  const handleDissoudre = async () => {
+    try {
+      await updateCouple(couple.id, { statut: "Dissous" });
+      toast.success("Couple dissous");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -31,7 +41,7 @@ export const ShowCouple = () => {
         </Link>
         <h1 className="mt-2 text-2xl font-bold text-gray-900">{couple.nom}</h1>
         <p className="text-sm text-gray-500">
-          Saison {couple.saison} · Fiche fictive (cahier DTS : rompre un couple).
+          Saison {couple.saison} · Fiche Firestore.
         </p>
       </div>
 
@@ -53,26 +63,21 @@ export const ShowCouple = () => {
               <span className="text-gray-500">Cage :</span> {couple.cage}
             </li>
             <li>
-              <span className="text-gray-500">Statut :</span>{" "}
-              {estDissous ? "Dissous" : couple.statut}
+              <span className="text-gray-500">Statut :</span> {couple.statut}
             </li>
           </ul>
 
-          {couple.statut !== "Dissous" ? (
+          {!estDissous ? (
             <button
               type="button"
-              disabled={rompu}
-              onClick={() => setRompu(true)}
-              className="mt-6 w-full rounded-lg border border-amber-300 bg-amber-50 py-2.5 text-sm font-medium text-amber-900 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={handleDissoudre}
+              className="mt-6 w-full rounded-lg border border-amber-300 bg-amber-50 py-2.5 text-sm font-medium text-amber-900 hover:bg-amber-100"
             >
-              {rompu ? "Couple rompu (simulation locale)" : "Rompre ce couple"}
+              Rompre ce couple
             </button>
-          ) : null}
-          {couple.statut === "Dissous" ? (
-            <p className="mt-4 text-sm text-gray-500">
-              Ce couple est déjà dissous dans les données fictives.
-            </p>
-          ) : null}
+          ) : (
+            <p className="mt-4 text-sm text-gray-500">Ce couple est dissous.</p>
+          )}
         </section>
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">

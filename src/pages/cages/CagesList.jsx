@@ -1,15 +1,18 @@
 import { Link } from "react-router-dom";
-import { MOCK_CAGES } from "../../data/mockData";
+
+import { useVoliere } from "../../context/VoliereDataContext";
 
 export const CagesList = () => {
+  const { cagesList } = useVoliere();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Cages</h1>
           <p className="mt-1 text-sm text-gray-500">
-            {MOCK_CAGES.length} compartiments (numéro, nom, superficie — cahier
-            DTS). Données synchronisées avec la visualisation virtuelle.
+            {cagesList.length} compartiments — données Firestore, synchronisées
+            avec la visualisation virtuelle.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -41,7 +44,7 @@ export const CagesList = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {MOCK_CAGES.map((c) => (
+              {cagesList.map((c) => (
                 <tr key={c.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium text-gray-900">{c.numero}</td>
                   <td className="px-4 py-3 text-gray-600">{c.nom}</td>

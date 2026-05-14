@@ -3,8 +3,16 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
+        <p className="text-sm text-gray-600">Connexion à Firebase…</p>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (

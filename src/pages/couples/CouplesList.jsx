@@ -1,15 +1,18 @@
 import { Link } from "react-router-dom";
-import { MOCK_COUPLES } from "../../data/mockData";
+
+import { useVoliere } from "../../context/VoliereDataContext";
 
 export const CouplesList = () => {
+  const { couples } = useVoliere();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Couples</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Créer un couple (mâle + femelle disponibles) — liste fictive. Consulter
-            les couples actifs et rompre un couple depuis la fiche détail.
+            Couples enregistrés dans Firestore. Rompre un couple depuis la fiche
+            détail.
           </p>
         </div>
         <Link
@@ -21,7 +24,7 @@ export const CouplesList = () => {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {MOCK_COUPLES.map((c) => (
+        {couples.map((c) => (
           <article
             key={c.id}
             className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"

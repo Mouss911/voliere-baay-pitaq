@@ -1,20 +1,41 @@
-import { Link, useParams } from "react-router-dom";
-import { getPigeonById } from "../../data/mockData";
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
-export const EditPigeon = () => {
-  const { id } = useParams();
-  const pigeon = getPigeonById(id);
+import { useVoliere } from "../../context/VoliereDataContext";
 
-  if (!pigeon) {
-    return (
-      <div className="space-y-4">
-        <h1 className="text-2xl font-bold text-gray-900">Pigeon introuvable</h1>
-        <Link to="/pigeons" className="text-green-600 hover:text-green-700">
-          Retour à la liste
-        </Link>
-      </div>
-    );
-  }
+function EditPigeonForm({ pigeon, updatePigeon }) {
+  const navigate = useNavigate();
+  const [bague, setBague] = useState(pigeon.bague ?? "");
+  const [sexe, setSexe] = useState(pigeon.sexe ?? "M");
+  const [statut, setStatut] = useState(pigeon.statut ?? "Actif");
+  const [couleur, setCouleur] = useState(pigeon.couleur ?? "");
+  const [naissance, setNaissance] = useState(pigeon.naissance ?? "");
+  const [lignee, setLignee] = useState(pigeon.lignee ?? "");
+  const [notes, setNotes] = useState(pigeon.notes ?? "");
+  const [busy, setBusy] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      await updatePigeon(pigeon.id, {
+        bague: bague.trim(),
+        sexe,
+        statut: statut.trim(),
+        couleur: couleur.trim(),
+        naissance: naissance.trim(),
+        lignee: lignee.trim(),
+        notes: notes.trim(),
+      });
+      toast.success("Fiche mise à jour");
+      navigate(`/pigeons/${pigeon.id}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur à la mise à jour");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -29,19 +50,20 @@ export const EditPigeon = () => {
           Modifier {pigeon.bague}
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          Champs préremplis avec les données fictives — sauvegarde désactivée.
+          Les modifications sont enregistrées dans Firestore.
         </p>
       </div>
 
       <form
         className="space-y-5 rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={handleSubmit}
       >
         <label className="block">
           <span className="text-sm font-medium text-gray-700">Bague</span>
           <input
             type="text"
-            defaultValue={pigeon.bague}
+            value={bague}
+            onChange={(e) => setBague(e.target.value)}
             className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           />
         </label>
@@ -49,18 +71,29 @@ export const EditPigeon = () => {
           <label className="block">
             <span className="text-sm font-medium text-gray-700">Sexe</span>
             <select
-              defaultValue={pigeon.sexe}
+              value={sexe}
+              onChange={(e) => setSexe(e.target.value)}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             >
-              <option>M</option>
-              <option>F</option>
+              <option value="M">M</option>
+              <option value="F">F</option>
             </select>
           </label>
           <label className="block">
             <span className="text-sm font-medium text-gray-700">Statut</span>
             <input
               type="text"
-              defaultValue={pigeon.statut}
+              value={statut}
+              onChange={(e) => setStatut(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            />
+          </label>
+          <label className="block sm:col-span-2">
+            <span className="text-sm font-medium text-gray-700">Naissance</span>
+            <input
+              type="text"
+              value={naissance}
+              onChange={(e) => setNaissance(e.target.value)}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             />
           </label>
@@ -68,7 +101,17 @@ export const EditPigeon = () => {
             <span className="text-sm font-medium text-gray-700">Couleur</span>
             <input
               type="text"
-              defaultValue={pigeon.couleur}
+              value={couleur}
+              onChange={(e) => setCouleur(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            />
+          </label>
+          <label className="block sm:col-span-2">
+            <span className="text-sm font-medium text-gray-700">Lignée</span>
+            <input
+              type="text"
+              value={lignee}
+              onChange={(e) => setLignee(e.target.value)}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             />
           </label>
@@ -76,7 +119,8 @@ export const EditPigeon = () => {
             <span className="text-sm font-medium text-gray-700">Notes</span>
             <textarea
               rows={3}
-              defaultValue={pigeon.notes}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             />
           </label>
@@ -84,10 +128,10 @@ export const EditPigeon = () => {
         <div className="flex flex-wrap gap-3">
           <button
             type="submit"
-            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white opacity-60"
-            disabled
+            disabled={busy}
+            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-60"
           >
-            Mettre à jour (API à brancher)
+            {busy ? "Mise à jour…" : "Mettre à jour"}
           </button>
           <Link
             to={`/pigeons/${pigeon.id}`}
@@ -98,5 +142,26 @@ export const EditPigeon = () => {
         </div>
       </form>
     </div>
+  );
+}
+
+export const EditPigeon = () => {
+  const { id } = useParams();
+  const { getPigeonById, updatePigeon } = useVoliere();
+  const pigeon = getPigeonById(id);
+
+  if (!pigeon) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-2xl font-bold text-gray-900">Pigeon introuvable</h1>
+        <Link to="/pigeons" className="text-green-600 hover:text-green-700">
+          Retour à la liste
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <EditPigeonForm key={pigeon.id} pigeon={pigeon} updatePigeon={updatePigeon} />
   );
 };

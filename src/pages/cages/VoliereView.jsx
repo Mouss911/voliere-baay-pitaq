@@ -1,16 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import {
-  INITIAL_VOLIERE_CAGES,
-  MOCK_COUPLES,
-  MOCK_PIGEONS,
-  occupationCourt,
-} from "../../data/mockData";
-
-function cloneCages() {
-  return INITIAL_VOLIERE_CAGES.map((c) => ({ ...c }));
-}
+import { useVoliere } from "../../context/VoliereDataContext";
+import { occupationCourt } from "../../data/mockData";
 
 function cellClasses(type) {
   if (type === "libre")
@@ -28,90 +20,67 @@ function titleCage(c) {
 }
 
 export const VoliereView = () => {
-  const [cages, setCages] = useState(cloneCages);
+  const { cages, pigeons, couples, updateCage } = useVoliere();
   const [selectedId, setSelectedId] = useState(null);
 
   const selected = useMemo(
-    () => cages.find((x) => x.id === selectedId) ?? null,
+    () => cages.find((x) => String(x.id) === String(selectedId)) ?? null,
     [cages, selectedId]
   );
 
   const pigeonsDisponiblesSolo = useMemo(
     () =>
-      MOCK_PIGEONS.filter((p) =>
-        ["Actif", "Jeune", "Repos"].includes(p.statut)
-      ),
-    []
+      pigeons.filter((p) => ["Actif", "Jeune", "Repos"].includes(p.statut)),
+    [pigeons]
   );
 
   const couplesDisponibles = useMemo(
-    () => MOCK_COUPLES.filter((c) => c.statut !== "Dissous"),
-    []
+    () => couples.filter((c) => c.statut !== "Dissous"),
+    [couples]
   );
 
-  const liberer = useCallback(() => {
+  const liberer = useCallback(async () => {
     if (!selectedId) return;
-    setCages((prev) =>
-      prev.map((c) =>
-        c.id === selectedId
-          ? {
-              ...c,
-              typeOccupation: "libre",
-              pigeonSoloBague: null,
-              coupleMale: null,
-              coupleFemelle: null,
-              historiqueApercu: "Cage libérée (simulation locale).",
-              reproductionApercu: "—",
-            }
-          : c
-      )
-    );
+    await updateCage(selectedId, {
+      typeOccupation: "libre",
+      pigeonSoloBague: null,
+      coupleMale: null,
+      coupleFemelle: null,
+      historiqueApercu: "Cage libérée.",
+      reproductionApercu: "—",
+    });
     setSelectedId(null);
-  }, [selectedId]);
+  }, [selectedId, updateCage]);
 
   const affecterPigeonSeul = useCallback(
-    (bague) => {
+    async (bague) => {
       if (!selectedId) return;
-      setCages((prev) =>
-        prev.map((c) =>
-          c.id === selectedId
-            ? {
-                ...c,
-                typeOccupation: "pigeon_seul",
-                pigeonSoloBague: bague,
-                coupleMale: null,
-                coupleFemelle: null,
-                historiqueApercu: `Pigeon ${bague} affecté (démo, sans API).`,
-              }
-            : c
-        )
-      );
+      await updateCage(selectedId, {
+        typeOccupation: "pigeon_seul",
+        pigeonSoloBague: bague,
+        coupleMale: null,
+        coupleFemelle: null,
+        historiqueApercu: `Pigeon ${bague} affecté.`,
+      });
       setSelectedId(null);
     },
-    [selectedId]
+    [selectedId, updateCage]
   );
 
   const affecterCouple = useCallback(
-    (male, femelle) => {
+    async (male, femelle) => {
       if (!selectedId) return;
-      setCages((prev) =>
-        prev.map((c) =>
-          c.id === selectedId
-            ? {
-                ...c,
-                typeOccupation: "couple",
-                pigeonSoloBague: null,
-                coupleMale: male,
-                coupleFemelle: femelle,
-                historiqueApercu: `Couple ${male} + ${femelle} placé (démo).`,
-                reproductionApercu: "Nouvelle portée à planifier.",
-              }
-            : c
-        )
-      );
+      await updateCage(selectedId, {
+        typeOccupation: "couple",
+        pigeonSoloBague: null,
+        coupleMale: male,
+        coupleFemelle: femelle,
+        historiqueApercu: `Couple ${male} + ${femelle} placé.`,
+        reproductionApercu: "Nouvelle portée à planifier.",
+      });
       setSelectedId(null);
     },
-    [selectedId]
+    [selectedId, updateCage]
   );
 
   return (
@@ -122,14 +91,11 @@ export const VoliereView = () => {
             Visualisation virtuelle de la volière
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-gray-600">
-            Grille type « places » (cahier DTS) :{" "}
+            Grille type « places » :{" "}
             <strong className="text-emerald-700">vert</strong> = libre,{" "}
-            <strong className="text-red-700">rouge</strong> = un pigeon seul
-            (bague au survol),{" "}
-            <strong className="text-amber-800">orange</strong> = couple (deux
-            bagues). Cliquez sur une case pour affecter ou consulter / libérer
-            — mise à jour <strong>sans rechargement</strong> de la page (état
-            React local).
+            <strong className="text-red-700">rouge</strong> = un pigeon seul,{" "}
+            <strong className="text-amber-800">orange</strong> = couple. Les
+            changements sont persistés dans Firestore.
           </p>
         </div>
         <Link
@@ -157,7 +123,7 @@ export const VoliereView = () => {
 
       <section className="rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-sm sm:p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-          Volière principale — 20 cages
+          Volière — {cages.length} cages
         </h2>
         <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-5 md:gap-3">
           {cages.map((c) => (
@@ -203,8 +169,7 @@ export const VoliereView = () => {
             {selected.typeOccupation === "libre" ? (
               <div className="mt-6 space-y-5">
                 <p className="text-sm text-gray-700">
-                  Cage libre : affectez un pigeon seul ou un couple (données
-                  locales, démo).
+                  Cage libre : affectez un pigeon seul ou un couple.
                 </p>
                 <AssignPigeonForm
                   key={selected.id}
@@ -258,7 +223,7 @@ export const VoliereView = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={liberer}
+                  onClick={() => liberer()}
                   className="w-full rounded-lg border border-red-200 bg-red-50 py-2.5 text-sm font-medium text-red-800 hover:bg-red-100"
                 >
                   Libérer la cage
@@ -286,7 +251,7 @@ function AssignPigeonForm({ pigeons, onPick }) {
   if (!pigeons.length) {
     return (
       <p className="rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-500">
-        Aucun pigeon disponible dans la liste fictive.
+        Aucun pigeon disponible pour placement seul.
       </p>
     );
   }
@@ -327,12 +292,12 @@ function AssignCoupleForm({ couples, onPick }) {
   if (!couples.length) {
     return (
       <p className="rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-500">
-        Aucun couple actif fictif à placer.
+        Aucun couple actif à placer.
       </p>
     );
   }
 
-  const c = couples.find((x) => x.id === cid) ?? couples[0];
+  const c = couples.find((x) => String(x.id) === String(cid)) ?? couples[0];
 
   return (
     <form
