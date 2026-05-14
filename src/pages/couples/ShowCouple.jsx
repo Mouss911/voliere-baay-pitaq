@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getCoupleById } from "../../data/mockData";
 
 export const ShowCouple = () => {
   const { id } = useParams();
   const couple = getCoupleById(id);
+  const [rompu, setRompu] = useState(false);
 
   if (!couple) {
     return (
@@ -16,6 +18,8 @@ export const ShowCouple = () => {
     );
   }
 
+  const estDissous = couple.statut === "Dissous" || rompu;
+
   return (
     <div className="space-y-6">
       <div>
@@ -26,7 +30,9 @@ export const ShowCouple = () => {
           ← Couples
         </Link>
         <h1 className="mt-2 text-2xl font-bold text-gray-900">{couple.nom}</h1>
-        <p className="text-sm text-gray-500">Saison {couple.saison} · Fiche fictive</p>
+        <p className="text-sm text-gray-500">
+          Saison {couple.saison} · Fiche fictive (cahier DTS : rompre un couple).
+        </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -47,9 +53,26 @@ export const ShowCouple = () => {
               <span className="text-gray-500">Cage :</span> {couple.cage}
             </li>
             <li>
-              <span className="text-gray-500">Statut :</span> {couple.statut}
+              <span className="text-gray-500">Statut :</span>{" "}
+              {estDissous ? "Dissous" : couple.statut}
             </li>
           </ul>
+
+          {couple.statut !== "Dissous" ? (
+            <button
+              type="button"
+              disabled={rompu}
+              onClick={() => setRompu(true)}
+              className="mt-6 w-full rounded-lg border border-amber-300 bg-amber-50 py-2.5 text-sm font-medium text-amber-900 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {rompu ? "Couple rompu (simulation locale)" : "Rompre ce couple"}
+            </button>
+          ) : null}
+          {couple.statut === "Dissous" ? (
+            <p className="mt-4 text-sm text-gray-500">
+              Ce couple est déjà dissous dans les données fictives.
+            </p>
+          ) : null}
         </section>
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">

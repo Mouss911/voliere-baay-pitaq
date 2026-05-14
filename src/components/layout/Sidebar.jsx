@@ -6,7 +6,7 @@ import {
   FaEgg,
   FaBorderAll,
   FaFeatherAlt,
-  FaRoute,
+  FaDoorOpen,
   FaCog,
 } from "react-icons/fa";
 
@@ -17,9 +17,9 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
     { name: "Couples", path: "/couples", icon: FaHeart },
     { name: "Reproductions", path: "/reproductions", icon: FaEgg },
     { name: "Cages", path: "/cages", icon: FaBorderAll },
-    { name: "Volière", path: "/voliere", icon: FaFeatherAlt },
-    { name: "Sorties", path: "/sorties", icon: FaRoute },
-    { name: "Settings", path: "/settings", icon: FaCog },
+    { name: "Volière (grille)", path: "/voliere", icon: FaFeatherAlt },
+    { name: "Sorties cheptel", path: "/sorties", icon: FaDoorOpen },
+    { name: "Paramètres", path: "/settings", icon: FaCog },
   ];
 
   const closeIfMobile = () => {
@@ -45,11 +45,24 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         ].join(" ")}
       >
-        <h1 className="mb-8 text-center text-xl font-bold sm:mb-10 sm:text-2xl">
-          Volière App
-        </h1>
+        <header className="-mx-4 -mt-4 mb-8 flex items-center gap-3 border-b border-gray-800 bg-gray-900 px-4 pb-5 pt-4 sm:mb-10">
+          <div
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-600 sm:h-14 sm:w-14"
+            aria-hidden
+          >
+            <FaDove className="h-6 w-6 text-white opacity-95 sm:h-7 sm:w-7" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-lg font-bold leading-tight text-white sm:text-xl">
+              Volière
+            </p>
+            <p className="mt-0.5 text-sm font-normal leading-tight text-gray-400">
+              Baay Pitàq
+            </p>
+          </div>
+        </header>
 
-        <nav className="flex flex-col gap-2 overflow-y-auto">
+        <nav className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
           {links.map(({ path, name, icon: Icon }) => (
             <NavLink
               key={path}

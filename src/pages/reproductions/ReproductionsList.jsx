@@ -36,7 +36,8 @@ export const ReproductionsList = () => {
                 <th className="px-4 py-3 font-medium">Date ponte</th>
                 <th className="px-4 py-3 font-medium">Œufs</th>
                 <th className="px-4 py-3 font-medium">Éclosion prévue</th>
-                <th className="px-4 py-3 font-medium">Jeunes</th>
+                <th className="px-4 py-3 font-medium">Jeunes (nombre)</th>
+                <th className="px-4 py-3 font-medium">Jeunes bagués</th>
                 <th className="px-4 py-3 font-medium">Statut</th>
               </tr>
             </thead>
@@ -50,6 +51,9 @@ export const ReproductionsList = () => {
                   <td className="px-4 py-3 text-gray-600">{r.oeufs}</td>
                   <td className="px-4 py-3 text-gray-600">{r.eclosionPrev}</td>
                   <td className="px-4 py-3 text-gray-600">{r.jeunes}</td>
+                  <td className="max-w-[220px] px-4 py-3 text-gray-600">
+                    {r.jeunesBagues ?? "—"}
+                  </td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-800">
                       {r.statut}

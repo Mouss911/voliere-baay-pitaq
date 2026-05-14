@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 |--------------------------------------------------------------------------
 */
 import DashboardLayout from "../components/layout/DashboardLayout";
+import ProtectedRoute from "../components/layout/ProtectedRoute";
 
 /*
 |--------------------------------------------------------------------------
@@ -88,7 +89,14 @@ export default function AppRoutes() {
       <Route path="/register" element={<Register />} />
 
       {/* ================= DASHBOARD LAYOUT ================= */}
-      <Route path="/" element={<DashboardLayout />}>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
         {/* Dashboard */}
         <Route index element={<Dashboard />} />
 

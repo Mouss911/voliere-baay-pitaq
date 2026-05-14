@@ -1,6 +1,17 @@
+import { useNavigate } from "react-router-dom";
 import { FaBars, FaSignOutAlt } from "react-icons/fa";
 
+import { useAuth } from "../../context/AuthContext";
+
 export default function Navbar({ onMenuClick }) {
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
   return (
     <header className="shrink-0 bg-white px-4 py-3 shadow sm:px-6 sm:py-4">
       <div className="flex min-w-0 items-center justify-between gap-3">
@@ -13,13 +24,19 @@ export default function Navbar({ onMenuClick }) {
           >
             <FaBars className="h-5 w-5 shrink-0" aria-hidden />
           </button>
-          <h2 className="truncate text-lg font-semibold sm:text-xl">
-            Gestion de Volière
-          </h2>
+          <div className="min-w-0">
+            <h2 className="truncate text-lg font-semibold sm:text-xl">
+              Gestion de volière
+            </h2>
+            {user?.email ? (
+              <p className="truncate text-xs text-gray-500 sm:text-sm">{user.email}</p>
+            ) : null}
+          </div>
         </div>
 
         <button
           type="button"
+          onClick={handleLogout}
           className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-green-600 px-3 py-2 text-sm text-white sm:px-4 sm:text-base"
           aria-label="Déconnexion"
         >

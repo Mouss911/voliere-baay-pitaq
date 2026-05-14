@@ -3,8 +3,15 @@ import {
   MOCK_PIGEONS,
   MOCK_COUPLES,
   MOCK_CAGES,
-  MOCK_SORTIES,
+  MOCK_SORTIES_CHEPTEL,
+  INITIAL_VOLIERE_CAGES,
 } from "../../data/mockData";
+
+const labelsType = {
+  vente: "Vente",
+  deces: "Décès",
+  perte: "Perte",
+};
 
 function StatCard({ label, value, hint }) {
   return (
@@ -20,20 +27,23 @@ function StatCard({ label, value, hint }) {
 
 export default function Dashboard() {
   const pigeonsActifs = MOCK_PIGEONS.filter((p) =>
-    ["Actif", "Jeune"].includes(p.statut)
+    ["Actif", "Jeune", "Repos"].includes(p.statut)
   ).length;
-  const cagesOccupees = MOCK_CAGES.filter((c) => c.statut === "Occupée").length;
-  const derniereSortie = MOCK_SORTIES[0];
+  const cagesLibres = INITIAL_VOLIERE_CAGES.filter(
+    (c) => c.typeOccupation === "libre"
+  ).length;
+  const derniereSortie = MOCK_SORTIES_CHEPTEL[0];
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Tableau de bord
+          Tableau de bord — Baay Pitàq
         </h1>
         <p className="mt-2 text-gray-600">
-          Vue d’ensemble de la volière — chiffres et listes ci-dessous sont des{" "}
-          <strong>exemples</strong> en attendant le backend.
+          Aperçu quotidien de la volière (données fictives, conformes au sujet de
+          validation DTS : pigeons, couples, reproductions, cages, sorties
+          cheptel et visualisation).
         </p>
       </div>
 
@@ -41,29 +51,35 @@ export default function Dashboard() {
         className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
         role="status"
       >
-        Données fictives : elles servent uniquement à prévisualiser l’interface.
+        Données de démonstration : à brancher sur une API + base de données pour
+        la soutenance.
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Pigeons (actifs / jeunes)" value={pigeonsActifs} />
-        <StatCard label="Couples cette saison" value={MOCK_COUPLES.length} />
+        <StatCard label="Pigeons actifs / jeunes" value={pigeonsActifs} />
         <StatCard
-          label="Cages occupées"
-          value={`${cagesOccupees} / ${MOCK_CAGES.length}`}
+          label="Couples (liste fictive)"
+          value={MOCK_COUPLES.filter((c) => c.statut !== "Dissous").length}
         />
         <StatCard
-          label="Dernière sortie"
-          value={derniereSortie ? `${derniereSortie.distanceKm} km` : "—"}
-          hint={derniereSortie?.date}
+          label="Cages libres / total"
+          value={`${cagesLibres} / ${MOCK_CAGES.length}`}
+        />
+        <StatCard
+          label="Dernière sortie cheptel"
+          value={
+            derniereSortie
+              ? labelsType[derniereSortie.type] ?? derniereSortie.type
+              : "—"
+          }
+          hint={derniereSortie?.bague}
         />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Couples suivis
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900">Couples suivis</h2>
             <Link
               to="/couples"
               className="text-sm font-medium text-green-600 hover:text-green-700"
@@ -91,23 +107,27 @@ export default function Dashboard() {
         <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">
-              Prochaines cages à vérifier
+              Visualisation volière
             </h2>
             <Link
-              to="/cages"
+              to="/voliere"
               className="text-sm font-medium text-green-600 hover:text-green-700"
             >
-              Cages
+              Ouvrir la grille
             </Link>
           </div>
-          <ul className="divide-y divide-gray-100">
-            {MOCK_CAGES.filter((c) => c.statut === "Occupée").map((c) => (
+          <p className="text-sm text-gray-600">
+            Consultez la grille des 20 cages (vert / rouge / orange) et testez
+            l’affectation ou la libération sans recharger la page.
+          </p>
+          <ul className="mt-4 divide-y divide-gray-100">
+            {MOCK_CAGES.filter((c) => c.typeOccupation !== "libre").slice(0, 4).map((c) => (
               <li key={c.id} className="flex items-center justify-between py-3">
                 <div>
-                  <p className="font-medium text-gray-900">{c.code}</p>
-                  <p className="text-sm text-gray-500">{c.occupant}</p>
+                  <p className="font-medium text-gray-900">{c.numero}</p>
+                  <p className="text-sm text-gray-500">{c.occupation}</p>
                 </div>
-                <span className="text-sm text-gray-500">{c.zone}</span>
+                <span className="text-xs text-gray-500">{c.superficieM2} m²</span>
               </li>
             ))}
           </ul>

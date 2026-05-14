@@ -8,7 +8,8 @@ export const CouplesList = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Couples</h1>
           <p className="mt-1 text-sm text-gray-500">
-            {MOCK_COUPLES.length} couples fictifs pour la démo.
+            Créer un couple (mâle + femelle disponibles) — liste fictive. Consulter
+            les couples actifs et rompre un couple depuis la fiche détail.
           </p>
         </div>
         <Link

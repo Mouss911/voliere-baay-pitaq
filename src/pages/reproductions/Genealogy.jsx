@@ -13,7 +13,8 @@ export const Genealogy = () => {
         </Link>
         <h1 className="mt-3 text-2xl font-bold text-gray-900">Généalogie</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Arbre simplifié (parents et grands-parents) pour quelques sujets fictifs.
+          Parents, grands-parents et descendance (exigence : connaître les parents
+          d’un pigeon, et les jeunes issus des portées).
         </p>
       </div>
 
@@ -38,6 +39,10 @@ export const Genealogy = () => {
                            /           \\
                     [${g.gpMaternel}]     [${g.gmMaternelle}]`}
               </pre>
+            </div>
+            <div className="mt-4 rounded-lg border border-green-100 bg-green-50/80 p-4">
+              <h3 className="text-sm font-semibold text-green-900">Descendance</h3>
+              <p className="mt-2 text-sm text-green-900/90">{g.enfants}</p>
             </div>
           </section>
         ))}

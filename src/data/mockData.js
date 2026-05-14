@@ -1,4 +1,70 @@
-/** Données fictives — à remplacer par les appels API */
+/** Données fictives — alignées sur le cahier DTS « gestion volière » (à remplacer par l’API). */
+
+/** @typedef {'libre' | 'pigeon_seul' | 'couple'} TypeOccupationCage */
+
+function createVolierCages20() {
+  /** @type {Array<{ id: string; numero: string; nom: string; superficieM2: number; typeOccupation: TypeOccupationCage; pigeonSoloBague: string | null; coupleMale: string | null; coupleFemelle: string | null; historiqueApercu: string; reproductionApercu: string }>} */
+  const cages = [];
+  for (let i = 1; i <= 20; i++) {
+    const n = String(i).padStart(2, "0");
+    cages.push({
+      id: String(i),
+      numero: `Cage${n}`,
+      nom: `Compartiment ${n}`,
+      superficieM2: Number((1.0 + (i % 4) * 0.25).toFixed(2)),
+      typeOccupation: "libre",
+      pigeonSoloBague: null,
+      coupleMale: null,
+      coupleFemelle: null,
+      historiqueApercu: "Aucun événement récent (démo).",
+      reproductionApercu: "—",
+    });
+  }
+  // Exemples document : Cage02 seul (quarantaine), Cage03 couple C001…
+  cages[1].typeOccupation = "pigeon_seul";
+  cages[1].pigeonSoloBague = "SN-2024-031";
+  cages[1].historiqueApercu = "Quarantaine depuis le 02/04/2025.";
+
+  cages[2].typeOccupation = "couple";
+  cages[2].coupleMale = "SN-2024-014";
+  cages[2].coupleFemelle = "SN-2023-088";
+  cages[2].historiqueApercu = "Couple formé le 01/05/2024.";
+  cages[2].reproductionApercu = "Portée 2025-1 : 2 œufs en couvaison.";
+
+  cages[4].typeOccupation = "couple";
+  cages[4].coupleMale = "SN-2021-055";
+  cages[4].coupleFemelle = "SN-2022-201";
+  cages[4].historiqueApercu = "Repos hors nid.";
+  cages[4].reproductionApercu = "Dernière portée : 1 jeune sevré.";
+
+  return cages;
+}
+
+export const INITIAL_VOLIERE_CAGES = createVolierCages20();
+
+export function occupationResume(c) {
+  if (c.typeOccupation === "libre") return "Libre";
+  if (c.typeOccupation === "pigeon_seul") return c.pigeonSoloBague ?? "—";
+  if (c.typeOccupation === "couple")
+    return `${c.coupleMale ?? "?"} + ${c.coupleFemelle ?? "?"}`;
+  return "—";
+}
+
+export function occupationCourt(c) {
+  if (c.typeOccupation === "libre") return "Libre";
+  if (c.typeOccupation === "pigeon_seul") return c.pigeonSoloBague ?? "";
+  return "Couple";
+}
+
+/** Liste admin cages (même jeu que la visualisation). */
+export const MOCK_CAGES = INITIAL_VOLIERE_CAGES.map((c) => ({
+  id: c.id,
+  numero: c.numero,
+  nom: c.nom,
+  superficieM2: c.superficieM2,
+  typeOccupation: c.typeOccupation,
+  occupation: occupationResume(c),
+}));
 
 export const MOCK_PIGEONS = [
   {
@@ -27,7 +93,7 @@ export const MOCK_PIGEONS = [
     sexe: "F",
     couleur: "Gris clair",
     naissance: "2022-07-01",
-    statut: "Repos",
+    statut: "Actif",
     lignee: "Vandenabeele",
     notes: "",
   },
@@ -51,6 +117,26 @@ export const MOCK_PIGEONS = [
     lignee: "Mixte",
     notes: "En volière d’élevage.",
   },
+  {
+    id: "6",
+    bague: "SN-2020-400",
+    sexe: "M",
+    couleur: "Gris",
+    naissance: "2020-02-14",
+    statut: "Vendu",
+    lignee: "Boulant",
+    notes: "Sorti du cheptel — historique conservé.",
+  },
+  {
+    id: "7",
+    bague: "SN-2019-111",
+    sexe: "F",
+    couleur: "Bleu barré",
+    naissance: "2019-04-20",
+    statut: "Mort",
+    lignee: "Local",
+    notes: "Décès déclaré en salle.",
+  },
 ];
 
 export const MOCK_COUPLES = [
@@ -60,8 +146,8 @@ export const MOCK_COUPLES = [
     maleBague: "SN-2024-014",
     femelleBague: "SN-2023-088",
     saison: "2025",
-    statut: "Couvaison",
-    cage: "A-12",
+    statut: "Actif",
+    cage: "Cage03",
   },
   {
     id: "2",
@@ -69,8 +155,8 @@ export const MOCK_COUPLES = [
     maleBague: "SN-2021-055",
     femelleBague: "SN-2022-201",
     saison: "2025",
-    statut: "Repos",
-    cage: "A-08",
+    statut: "Actif",
+    cage: "Cage05",
   },
   {
     id: "3",
@@ -92,66 +178,54 @@ export const MOCK_REPRODUCTIONS = [
     eclosionPrev: "2025-04-18",
     statut: "Couvaison",
     jeunes: 0,
+    jeunesBagues: "—",
   },
   {
     id: "2",
     coupleNom: "Paire nord",
     datePonte: "2024-08-10",
+    dateEclosion: "2024-08-24",
     oeufs: 2,
     eclosionPrev: "2024-08-26",
     statut: "Sevrés",
     jeunes: 2,
+    jeunesBagues: "SN-2024-100 (M), SN-2024-101 (F)",
   },
   {
     id: "3",
     coupleNom: "Paire sud",
     datePonte: "2025-03-15",
+    dateEclosion: "2025-03-29",
     oeufs: 1,
     eclosionPrev: "2025-03-30",
     statut: "Éclos",
     jeunes: 1,
+    jeunesBagues: "SN-2025-020 (M)",
   },
 ];
 
-export const MOCK_CAGES = [
-  { id: "1", code: "A-01", zone: "Bloc A", etage: 1, type: "Couple", occupant: "SN-2024-031", statut: "Occupée" },
-  { id: "2", code: "A-08", zone: "Bloc A", etage: 1, type: "Couple", occupant: "Paire sud", statut: "Occupée" },
-  { id: "3", code: "A-12", zone: "Bloc A", etage: 2, type: "Couple", occupant: "Paire nord", statut: "Occupée" },
-  { id: "4", code: "B-03", zone: "Bloc B", etage: 1, type: "Jeunes", occupant: "12 sujets", statut: "Occupée" },
-  { id: "5", code: "B-07", zone: "Bloc B", etage: 1, type: "Quarantaine", occupant: "—", statut: "Libre" },
-  { id: "6", code: "B-11", zone: "Bloc B", etage: 2, type: "Couple", occupant: "—", statut: "Libre" },
-];
-
-export const MOCK_SORTIES = [
+/** Sorties du cheptel (vente, décès, perte) — glossaire section 3.4 */
+export const MOCK_SORTIES_CHEPTEL = [
   {
-    id: "1",
-    date: "2025-05-10",
-    type: "Entraînement",
-    distanceKm: 40,
-    liberes: 28,
-    retours: 27,
-    lieu: "Thiès",
-    meteo: "Vent NE léger",
+    id: "s1",
+    type: "vente",
+    bague: "SN-2020-400",
+    date: "2024-08-15",
+    detail: "Acheteur : M. Dupont (colombophile) — 150 €",
   },
   {
-    id: "2",
-    date: "2025-05-03",
-    type: "Entraînement",
-    distanceKm: 25,
-    liberes: 30,
-    retours: 30,
-    lieu: "Dakar",
-    meteo: "Clair",
+    id: "s2",
+    type: "deces",
+    bague: "SN-2019-111",
+    date: "2025-01-03",
+    detail: "Cause probable : infection respiratoire",
   },
   {
-    id: "3",
-    date: "2025-04-28",
-    type: "Concours",
-    distanceKm: 180,
-    liberes: 18,
-    retours: 16,
-    lieu: "Saint-Louis",
-    meteo: "Chaud",
+    id: "s3",
+    type: "perte",
+    bague: "SN-2023-200",
+    date: "2024-11-12",
+    detail: "Non retour après lâcher concours (Saint-Louis)",
   },
 ];
 
@@ -164,6 +238,7 @@ export const MOCK_GENEALOGY = [
     gmPaternelle: "BE-2017-3301",
     gpMaternel: "NL-2015-5001",
     gmMaternelle: "NL-2016-6102",
+    enfants: "SN-2024-100, SN-2024-101 (portée fictive liée à la reproduction #2)",
   },
   {
     sujet: "SN-2023-088",
@@ -173,15 +248,16 @@ export const MOCK_GENEALOGY = [
     gmPaternelle: "FR-2016-2102",
     gpMaternel: "SN-2017-0881",
     gmMaternelle: "SN-2018-0901",
+    enfants: "SN-2024-100, SN-2024-101, SN-2025-020",
   },
 ];
 
 export const MOCK_USER_SETTINGS = {
-  nom: "Aminata Diallo",
-  email: "aminata.diallo@example.com",
-  voliere: "Volière Baay Pitaq",
+  nom: "Thiémokho — Baay Pitàq",
+  email: "baay.pitaq@example.com",
+  voliere: "Volière Baay Pitàq — Dakar",
   ville: "Dakar",
-  fuseau: "UTC±0 (Afrique/Dakar)",
+  fuseau: "Africa/Dakar",
   uniteDistance: "km",
   langue: "Français",
 };

@@ -1,6 +1,18 @@
 import { Link } from "react-router-dom";
 import { MOCK_PIGEONS } from "../../data/mockData";
 
+function badgeStatut(statut) {
+  const map = {
+    Actif: "bg-green-100 text-green-800",
+    Jeune: "bg-sky-100 text-sky-800",
+    Repos: "bg-gray-100 text-gray-800",
+    Vendu: "bg-blue-100 text-blue-800",
+    Mort: "bg-zinc-200 text-zinc-900",
+    Perdu: "bg-orange-100 text-orange-900",
+  };
+  return map[statut] ?? "bg-gray-100 text-gray-800";
+}
+
 export default function PigeonsList() {
   return (
     <div className="space-y-6">
@@ -8,7 +20,8 @@ export default function PigeonsList() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Pigeons</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Inventaire fictif ({MOCK_PIGEONS.length} fiches).
+            CRUD fictif — statuts conformes au sujet (dont vente / décès = sortie du
+            cheptel ; suppression logique si descendance).
           </p>
         </div>
         <Link
@@ -43,7 +56,9 @@ export default function PigeonsList() {
                   <td className="px-4 py-3 text-gray-600">{p.couleur}</td>
                   <td className="px-4 py-3 text-gray-600">{p.naissance}</td>
                   <td className="px-4 py-3">
-                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-800">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${badgeStatut(p.statut)}`}
+                    >
                       {p.statut}
                     </span>
                   </td>

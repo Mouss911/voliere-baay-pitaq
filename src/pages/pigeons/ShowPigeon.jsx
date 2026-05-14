@@ -29,6 +29,12 @@ export const ShowPigeon = () => {
           </Link>
           <h1 className="mt-2 text-2xl font-bold text-gray-900">{pigeon.bague}</h1>
           <p className="text-sm text-gray-500">Fiche fictive #{pigeon.id}</p>
+          {["Vendu", "Mort", "Perdu"].includes(pigeon.statut) ? (
+            <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+              Sortie du cheptel enregistrée (cahier DTS) : ce pigeon ne doit plus
+              occuper de cage ; la fiche reste consultable pour la traçabilité.
+            </p>
+          ) : null}
         </div>
         <Link
           to={`/pigeons/${pigeon.id}/edit`}

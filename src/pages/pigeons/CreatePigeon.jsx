@@ -14,7 +14,9 @@ export const CreatePigeon = () => {
           Nouveau pigeon
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          Formulaire de démonstration — non enregistré sans API.
+          Règle métier (sujet) : pas de suppression physique si descendance — en
+          production ce sera une suppression logique (statut vendu / mort /
+          perdu).
         </p>
       </div>
 
