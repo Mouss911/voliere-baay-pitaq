@@ -2,9 +2,14 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
+import { Button, ImageUpload } from "../../components/ui";
 import { useVoliere } from "../../context/VoliereDataContext";
+import { useAuth } from "../../context/AuthContext";
+import { usePigeonImageField } from "../../hooks/usePigeonImageField";
+import { uploadImage } from "../../firebase/storageUtils";
 
 function EditPigeonForm({ pigeon, updatePigeon }) {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [bague, setBague] = useState(pigeon.bague ?? "");
   const [sexe, setSexe] = useState(pigeon.sexe ?? "M");
@@ -14,11 +19,29 @@ function EditPigeonForm({ pigeon, updatePigeon }) {
   const [lignee, setLignee] = useState(pigeon.lignee ?? "");
   const [notes, setNotes] = useState(pigeon.notes ?? "");
   const [busy, setBusy] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const { imageFile, displayUrl, selectFile, clearImage, cleared } =
+    usePigeonImageField(pigeon.imageUrl);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setBusy(true);
     try {
+      let imageUrl = cleared ? null : pigeon.imageUrl;
+
+      if (imageFile) {
+        if (!user?.uid) {
+          toast.error("Connectez-vous pour envoyer une image.");
+          return;
+        }
+        setUploadingImage(true);
+        try {
+          imageUrl = await uploadImage(user.uid, imageFile, "pigeons");
+        } finally {
+          setUploadingImage(false);
+        }
+      }
+
       await updatePigeon(pigeon.id, {
         bague: bague.trim(),
         sexe,
@@ -27,6 +50,7 @@ function EditPigeonForm({ pigeon, updatePigeon }) {
         naissance: naissance.trim(),
         lignee: lignee.trim(),
         notes: notes.trim(),
+        imageUrl: imageUrl || null,
       });
       toast.success("Fiche mise à jour");
       navigate(`/pigeons/${pigeon.id}`);
@@ -34,6 +58,7 @@ function EditPigeonForm({ pigeon, updatePigeon }) {
       toast.error(err instanceof Error ? err.message : "Erreur à la mise à jour");
     } finally {
       setBusy(false);
+      setUploadingImage(false);
     }
   };
 
@@ -50,7 +75,7 @@ function EditPigeonForm({ pigeon, updatePigeon }) {
           Modifier {pigeon.bague}
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          Les modifications sont enregistrées dans Firestore.
+          Firestore + photo Cloudinary.
         </p>
       </div>
 
@@ -124,15 +149,26 @@ function EditPigeonForm({ pigeon, updatePigeon }) {
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             />
           </label>
+
+          <ImageUpload
+            previewUrl={displayUrl}
+            onFileSelect={selectFile}
+            onClear={clearImage}
+            disabled={busy || uploadingImage}
+          />
         </div>
         <div className="flex flex-wrap gap-3">
-          <button
+          <Button
             type="submit"
-            disabled={busy}
-            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-60"
+            variant="primary"
+            disabled={busy || uploadingImage}
           >
-            {busy ? "Mise à jour…" : "Mettre à jour"}
-          </button>
+            {uploadingImage
+              ? "Envoi de l'image…"
+              : busy
+                ? "Mise à jour…"
+                : "Mettre à jour"}
+          </Button>
           <Link
             to={`/pigeons/${pigeon.id}`}
             className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"

@@ -46,6 +46,16 @@ export const ShowPigeon = () => {
         </Link>
       </div>
 
+      {pigeon.imageUrl && (
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <img
+            src={pigeon.imageUrl}
+            alt={`Photo de ${pigeon.bague}`}
+            className="h-auto max-h-96 w-full rounded-lg object-cover"
+          />
+        </div>
+      )}
+
       <dl className="grid gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:grid-cols-2">
         <div>
           <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">

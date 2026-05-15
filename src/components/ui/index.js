@@ -3,6 +3,7 @@ export { pigeonStatutVariant } from "./badgeVariants.js";
 export { Button } from "./Button.jsx";
 export { Card, CardBody, CardHeader } from "./Card.jsx";
 export { EmptyState } from "./EmptyState.jsx";
+export { ImageUpload } from "./ImageUpload.jsx";
 export { Input } from "./Input.jsx";
 export { Loader } from "./Loader.jsx";
 export { Modal } from "./Modal.jsx";

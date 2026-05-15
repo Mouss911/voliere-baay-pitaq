@@ -2,18 +2,25 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
+import { Button, ImageUpload } from "../../components/ui";
 import { useVoliere } from "../../context/VoliereDataContext";
+import { useAuth } from "../../context/AuthContext";
+import { usePigeonImageField } from "../../hooks/usePigeonImageField";
+import { uploadImage } from "../../firebase/storageUtils";
 
 export const CreatePigeon = () => {
   const { addPigeon } = useVoliere();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [bague, setBague] = useState("");
   const [sexe, setSexe] = useState("M");
   const [naissance, setNaissance] = useState("");
   const [couleur, setCouleur] = useState("");
   const [lignee, setLignee] = useState("");
   const [notes, setNotes] = useState("");
+  const { imageFile, displayUrl, selectFile, clearImage } = usePigeonImageField();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,6 +30,21 @@ export const CreatePigeon = () => {
     }
     setBusy(true);
     try {
+      let imageUrl = null;
+
+      if (imageFile) {
+        if (!user?.uid) {
+          toast.error("Connectez-vous pour envoyer une image.");
+          return;
+        }
+        setUploadingImage(true);
+        try {
+          imageUrl = await uploadImage(user.uid, imageFile, "pigeons");
+        } finally {
+          setUploadingImage(false);
+        }
+      }
+
       const id = await addPigeon({
         bague: bague.trim(),
         sexe,
@@ -31,6 +53,7 @@ export const CreatePigeon = () => {
         statut: "Actif",
         lignee: lignee.trim() || "—",
         notes: notes.trim(),
+        imageUrl: imageUrl || null,
       });
       toast.success("Pigeon enregistré");
       navigate(`/pigeons/${id}`);
@@ -38,6 +61,7 @@ export const CreatePigeon = () => {
       toast.error(err instanceof Error ? err.message : "Erreur à l’enregistrement");
     } finally {
       setBusy(false);
+      setUploadingImage(false);
     }
   };
 
@@ -54,7 +78,7 @@ export const CreatePigeon = () => {
           Nouveau pigeon
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          Enregistrement dans Cloud Firestore.
+          Fiche enregistrée dans Firestore. Photo hébergée sur Cloudinary.
         </p>
       </div>
 
@@ -122,15 +146,26 @@ export const CreatePigeon = () => {
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             />
           </label>
+
+          <ImageUpload
+            previewUrl={displayUrl}
+            onFileSelect={selectFile}
+            onClear={clearImage}
+            disabled={busy || uploadingImage}
+          />
         </div>
         <div className="flex flex-wrap gap-3 pt-2">
-          <button
+          <Button
             type="submit"
-            disabled={busy}
-            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-60"
+            variant="primary"
+            disabled={busy || uploadingImage}
           >
-            {busy ? "Enregistrement…" : "Enregistrer"}
-          </button>
+            {uploadingImage
+              ? "Envoi de l'image…"
+              : busy
+                ? "Enregistrement…"
+                : "Enregistrer"}
+          </Button>
           <Link
             to="/pigeons"
             className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
