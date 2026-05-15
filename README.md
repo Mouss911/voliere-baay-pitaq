@@ -2,7 +2,7 @@
 
 Application web **responsive** de gestion de volière (colombophilie), développée dans le cadre du **projet de validation DTS** (Bakeli). Elle couvre pigeons, couples, reproductions, cages, sorties du cheptel (vente / décès / perte) et une **visualisation virtuelle** des compartiments (grille type « places »).
 
-> **État actuel** : front-end fonctionnel avec **données fictives** (`src/data/mockData.js`) et authentification **démo**. Backend, base de données et déploiement sont à brancher pour la soutenance.
+> **État actuel** : front-end fonctionnel avec authentification **Firestore**, base de données **Firestore**, et upload d'images via **Cloudinary**. API complète et déploiement à finaliser pour la soutenance.
 
 ---
 
@@ -11,7 +11,7 @@ Application web **responsive** de gestion de volière (colombophilie), développ
 | Module | Description |
 |--------|-------------|
 | **Authentification** | Connexion démo (e-mail non vide accepté), session `sessionStorage`, routes protégées |
-| **Pigeons** | Liste, fiche, création / édition (formulaires, sauvegarde désactivée sans API) |
+| **Pigeons** | Liste, fiche, création / édition (formulaires, sauvegarde), **upload d'images** (Firebase Storage) |
 | **Couples** | Liste, détail, création, **rompre un couple** (simulation locale) |
 | **Reproductions** | Suivi des pontes, jeunes bagués, lien vers **généalogie** |
 | **Cages** | Liste (numéro, nom, superficie, occupation), création (maquette) |
@@ -21,12 +21,42 @@ Application web **responsive** de gestion de volière (colombophilie), développ
 
 ---
 
+## Images des pigeons
+
+L'application supporte l'upload de photos pour chaque pigeon, stockées dans **Cloudinary**.
+
+### Fonctionnalités
+
+- **Création** : Ajouter une image lors de l'enregistrement d'un nouveau pigeon  
+- **Modification** : Remplacer la photo existante ou en conserver l'actuelle  
+- **Affichage** : La photo s'affiche sur la fiche pigeon (vue détail)  
+- **Aperçu** : Visualisation en temps réel avant validation  
+
+### Spécifications
+
+| Paramètre | Valeur |
+|-----------|--------|
+| **Formats acceptés** | JPEG, PNG, WebP, GIF |
+| **Taille max** | 5 MB |
+| **Stockage** | Cloudinary (CDN optimisé pour images) |
+| **Sauvegarde** | URL de l'image dans le champ `imageUrl` du document Firestore |
+
+### Utilisation
+
+1. **Créer un pigeon** : Aller sur `Nouveau pigeon` → Sélectionner une image → Aperçu s'affiche → Enregistrer  
+2. **Éditer un pigeon** : Modifier la fiche → Remplacer l'image ou conserver l'actuelle → Mise à jour  
+3. **Consulter** : La photo apparaît en haut de la fiche pigeon si disponible  
+
+---
+
 ## Stack technique
 
 - **React** 19 + **Vite** 8  
 - **React Router** 7  
 - **Tailwind CSS** 4 (`@tailwindcss/vite`)  
-- **react-icons**, **axios** (prévu pour l’API), **react-hot-toast**, **sweetalert2**, **framer-motion** (disponibles dans le projet)
+- **Firebase** 11 (authentification, Firestore)  
+- **Cloudinary** (upload et hosting d'images optimisées)  
+- **react-icons**, **axios** (prévu pour l'API), **react-hot-toast**, **sweetalert2**, **framer-motion** (disponibles dans le projet)
 
 ---
 
@@ -82,11 +112,11 @@ src/
 
 ## Prochaines étapes (livrables DTS)
 
-- **API** + **base de données** (Laravel, Django, Node ou Firebase selon le cahier)  
-- Remplacer `mockData.js` par des appels HTTP (ex. **axios**)  
-- **MCD** et schéma de données conformes aux règles métier  
-- **Déploiement** (URL publique pour la correction)  
-- **README** à compléter avec l’URL de prod et les identifiants de test si besoin
+- **API REST** + **base de données** (schéma complet, endpoints CRUD)  
+- Intégration **authentication complète** (Firestore Auth en production)  
+- **Optimisation images** (thumbnails Cloudinary, lazy loading)  
+- **Tests e2e** (authentification, création pigeon avec image, etc.)  
+- **Déploiement** (URL publique pour la correction)
 
 ---
 
