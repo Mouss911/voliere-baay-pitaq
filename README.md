@@ -110,16 +110,6 @@ src/
 
 ---
 
-## Prochaines étapes (livrables DTS)
-
-- **API REST** + **base de données** (schéma complet, endpoints CRUD)  
-- Intégration **authentication complète** (Firestore Auth en production)  
-- **Optimisation images** (thumbnails Cloudinary, lazy loading)  
-- **Tests e2e** (authentification, création pigeon avec image, etc.)  
-- **Déploiement** (URL publique pour la correction)
-
----
-
 ## Auteur & contexte
 
 Projet **Volière Baay Pitàq** — validation **DTS Développeur Web** (Bakeli School Of Technology, Dakar).
