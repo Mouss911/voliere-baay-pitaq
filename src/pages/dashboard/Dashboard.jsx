@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 
+import { Card } from "../../components/ui";
 import { useVoliere } from "../../context/VoliereDataContext";
 
 const labelsType = {
@@ -10,13 +11,13 @@ const labelsType = {
 
 function StatCard({ label, value, hint }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <Card className="p-4">
       <p className="text-sm font-medium text-gray-500">{label}</p>
       <p className="mt-1 text-3xl font-bold text-gray-900">{value}</p>
       {hint ? (
         <p className="mt-2 text-xs text-gray-400">{hint}</p>
       ) : null}
-    </div>
+    </Card>
   );
 }
 

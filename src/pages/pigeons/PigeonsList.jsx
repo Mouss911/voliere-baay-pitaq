@@ -1,18 +1,18 @@
 import { Link } from "react-router-dom";
 
+import {
+  Badge,
+  Button,
+  EmptyState,
+  pigeonStatutVariant,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "../../components/ui";
 import { useVoliere } from "../../context/VoliereDataContext";
-
-function badgeStatut(statut) {
-  const map = {
-    Actif: "bg-green-100 text-green-800",
-    Jeune: "bg-sky-100 text-sky-800",
-    Repos: "bg-gray-100 text-gray-800",
-    Vendu: "bg-blue-100 text-blue-800",
-    Mort: "bg-zinc-200 text-zinc-900",
-    Perdu: "bg-orange-100 text-orange-900",
-  };
-  return map[statut] ?? "bg-gray-100 text-gray-800";
-}
 
 export default function PigeonsList() {
   const { pigeons } = useVoliere();
@@ -27,59 +27,59 @@ export default function PigeonsList() {
             enregistrées côté cloud.
           </p>
         </div>
-        <Link
-          to="/pigeons/create"
-          className="inline-flex justify-center rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
-        >
+        <Button to="/pigeons/create" variant="primary">
           Ajouter un pigeon
-        </Link>
+        </Button>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-gray-200 bg-gray-50 text-gray-600">
-              <tr>
-                <th className="px-4 py-3 font-medium">Bague</th>
-                <th className="px-4 py-3 font-medium">Sexe</th>
-                <th className="px-4 py-3 font-medium">Couleur</th>
-                <th className="px-4 py-3 font-medium">Naissance</th>
-                <th className="px-4 py-3 font-medium">Statut</th>
-                <th className="px-4 py-3 font-medium">Lignée</th>
-                <th className="px-4 py-3 font-medium" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
+      {pigeons.length === 0 ? (
+        <EmptyState
+          title="Aucun pigeon"
+          description="Ajoutez votre premier pigeon ou vérifiez que les données Firestore sont bien chargées."
+        >
+          <Button to="/pigeons/create" variant="primary">
+            Nouveau pigeon
+          </Button>
+        </EmptyState>
+      ) : (
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Bague</TableHeaderCell>
+                <TableHeaderCell>Sexe</TableHeaderCell>
+                <TableHeaderCell>Couleur</TableHeaderCell>
+                <TableHeaderCell>Naissance</TableHeaderCell>
+                <TableHeaderCell>Statut</TableHeaderCell>
+                <TableHeaderCell>Lignée</TableHeaderCell>
+                <TableHeaderCell />
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {pigeons.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">
-                    {p.bague}
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">{p.sexe}</td>
-                  <td className="px-4 py-3 text-gray-600">{p.couleur}</td>
-                  <td className="px-4 py-3 text-gray-600">{p.naissance}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${badgeStatut(p.statut)}`}
-                    >
-                      {p.statut}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">{p.lignee}</td>
-                  <td className="px-4 py-3 text-right">
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium text-gray-900">{p.bague}</TableCell>
+                  <TableCell className="text-gray-600">{p.sexe}</TableCell>
+                  <TableCell className="text-gray-600">{p.couleur}</TableCell>
+                  <TableCell className="text-gray-600">{p.naissance}</TableCell>
+                  <TableCell>
+                    <Badge variant={pigeonStatutVariant(p.statut)}>{p.statut}</Badge>
+                  </TableCell>
+                  <TableCell className="text-gray-600">{p.lignee}</TableCell>
+                  <TableCell className="text-right">
                     <Link
                       to={`/pigeons/${p.id}`}
                       className="font-medium text-green-600 hover:text-green-700"
                     >
                       Fiche
                     </Link>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
-      </div>
+      )}
     </div>
   );
 }

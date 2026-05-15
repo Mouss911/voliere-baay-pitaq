@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
+import { Button, Modal } from "../../components/ui";
 import { useVoliere } from "../../context/VoliereDataContext";
 import { occupationCourt } from "../../data/mockData";
 
@@ -83,6 +84,8 @@ export const VoliereView = () => {
     [selectedId, updateCage]
   );
 
+  const closeModal = useCallback(() => setSelectedId(null), []);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -143,104 +146,91 @@ export const VoliereView = () => {
         </div>
       </section>
 
-      {selected ? (
-        <div
-          className="fixed inset-0 z-[100] flex items-end justify-center bg-black/45 p-4 sm:items-center"
-          role="presentation"
-          onClick={() => setSelectedId(null)}
-        >
-          <div
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="cage-dialog-title"
-            onClick={(e) => e.stopPropagation()}
+      <Modal
+        open={Boolean(selected)}
+        onClose={closeModal}
+        title={selected ? `${selected.numero} — ${selected.nom}` : ""}
+        description={
+          selected ? `Superficie indicative : ${selected.superficieM2} m²` : undefined
+        }
+        footer={
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full"
+            onClick={closeModal}
           >
-            <h2
-              id="cage-dialog-title"
-              className="text-lg font-semibold text-gray-900"
-            >
-              {selected.numero} — {selected.nom}
-            </h2>
-            <p className="mt-1 text-sm text-gray-500">
-              Superficie indicative : {selected.superficieM2} m²
+            Fermer
+          </Button>
+        }
+      >
+        {selected && selected.typeOccupation === "libre" ? (
+          <div className="space-y-5">
+            <p className="text-sm text-gray-700">
+              Cage libre : affectez un pigeon seul ou un couple.
             </p>
-
-            {selected.typeOccupation === "libre" ? (
-              <div className="mt-6 space-y-5">
-                <p className="text-sm text-gray-700">
-                  Cage libre : affectez un pigeon seul ou un couple.
-                </p>
-                <AssignPigeonForm
-                  key={selected.id}
-                  pigeons={pigeonsDisponiblesSolo}
-                  onPick={(bague) => affecterPigeonSeul(bague)}
-                />
-                <AssignCoupleForm
-                  key={selected.id}
-                  couples={couplesDisponibles}
-                  onPick={(m, f) => affecterCouple(m, f)}
-                />
-              </div>
-            ) : (
-              <div className="mt-6 space-y-4 text-sm text-gray-800">
-                <div className="rounded-lg bg-gray-50 p-4">
-                  <p className="font-medium text-gray-900">Contenu</p>
-                  {selected.typeOccupation === "pigeon_seul" ? (
-                    <p className="mt-2">
-                      Pigeon seul :{" "}
-                      <strong>{selected.pigeonSoloBague}</strong>
-                    </p>
-                  ) : (
-                    <p className="mt-2">
-                      Couple :{" "}
-                      <strong>
-                        {selected.coupleMale} + {selected.coupleFemelle}
-                      </strong>
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase text-gray-500">
-                    Historique / suivi (aperçu)
-                  </p>
-                  <p className="mt-1">{selected.historiqueApercu}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase text-gray-500">
-                    Reproduction
-                  </p>
-                  <p className="mt-1">{selected.reproductionApercu}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase text-gray-500">
-                    Historique médical (exemple)
-                  </p>
-                  <p className="mt-1 text-gray-600">
-                    Vaccin paramyxo : à jour (fictif). Dernière visite véto :
-                    12/03/2025.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => liberer()}
-                  className="w-full rounded-lg border border-red-200 bg-red-50 py-2.5 text-sm font-medium text-red-800 hover:bg-red-100"
-                >
-                  Libérer la cage
-                </button>
-              </div>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setSelectedId(null)}
-              className="mt-6 w-full rounded-lg border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Fermer
-            </button>
+            <AssignPigeonForm
+              key={selected.id}
+              pigeons={pigeonsDisponiblesSolo}
+              onPick={(bague) => affecterPigeonSeul(bague)}
+            />
+            <AssignCoupleForm
+              key={selected.id}
+              couples={couplesDisponibles}
+              onPick={(m, f) => affecterCouple(m, f)}
+            />
           </div>
-        </div>
-      ) : null}
+        ) : null}
+        {selected && selected.typeOccupation !== "libre" ? (
+          <div className="space-y-4 text-sm text-gray-800">
+            <div className="rounded-lg bg-gray-50 p-4">
+              <p className="font-medium text-gray-900">Contenu</p>
+              {selected.typeOccupation === "pigeon_seul" ? (
+                <p className="mt-2">
+                  Pigeon seul :{" "}
+                  <strong>{selected.pigeonSoloBague}</strong>
+                </p>
+              ) : (
+                <p className="mt-2">
+                  Couple :{" "}
+                  <strong>
+                    {selected.coupleMale} + {selected.coupleFemelle}
+                  </strong>
+                </p>
+              )}
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase text-gray-500">
+                Historique / suivi (aperçu)
+              </p>
+              <p className="mt-1">{selected.historiqueApercu}</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase text-gray-500">
+                Reproduction
+              </p>
+              <p className="mt-1">{selected.reproductionApercu}</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase text-gray-500">
+                Historique médical (exemple)
+              </p>
+              <p className="mt-1 text-gray-600">
+                Vaccin paramyxo : à jour (fictif). Dernière visite véto :
+                12/03/2025.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="danger"
+              className="w-full"
+              onClick={() => liberer()}
+            >
+              Libérer la cage
+            </Button>
+          </div>
+        ) : null}
+      </Modal>
     </div>
   );
 };
@@ -276,12 +266,9 @@ function AssignPigeonForm({ pigeons, onPick }) {
           </option>
         ))}
       </select>
-      <button
-        type="submit"
-        className="mt-3 w-full rounded-lg bg-green-600 py-2 text-sm font-medium text-white hover:bg-green-700"
-      >
+      <Button type="submit" variant="primary" className="mt-3 w-full">
         Placer ce pigeon
-      </button>
+      </Button>
     </form>
   );
 }
@@ -319,12 +306,9 @@ function AssignCoupleForm({ couples, onPick }) {
           </option>
         ))}
       </select>
-      <button
-        type="submit"
-        className="mt-3 w-full rounded-lg bg-amber-600 py-2 text-sm font-medium text-white hover:bg-amber-700"
-      >
+      <Button type="submit" variant="amber" className="mt-3 w-full">
         Placer ce couple
-      </button>
+      </Button>
     </form>
   );
 }

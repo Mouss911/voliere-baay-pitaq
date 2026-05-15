@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
+import { Button, Input, Loader } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
 import { mapAuthError } from "../../firebase/authErrors";
 
@@ -45,11 +46,7 @@ export const Register = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-        <p className="text-sm text-gray-600">Initialisation…</p>
-      </div>
-    );
+    return <Loader message="Initialisation…" />;
   }
 
   return (
@@ -64,60 +61,46 @@ export const Register = () => {
         </p>
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Nom affiché</span>
-            <input
-              type="text"
-              autoComplete="name"
-              value={nom}
-              onChange={(e) => setNom(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">E-mail</span>
-            <input
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Mot de passe</span>
-            <input
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">
-              Confirmer le mot de passe
-            </span>
-            <input
-              type="password"
-              autoComplete="new-password"
-              value={password2}
-              onChange={(e) => setPassword2(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
-          </label>
+          <Input
+            label="Nom affiché"
+            name="displayName"
+            type="text"
+            autoComplete="name"
+            value={nom}
+            onChange={(e) => setNom(e.target.value)}
+          />
+          <Input
+            label="E-mail"
+            name="email"
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            label="Mot de passe"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Input
+            label="Confirmer le mot de passe"
+            name="password2"
+            type="password"
+            autoComplete="new-password"
+            value={password2}
+            onChange={(e) => setPassword2(e.target.value)}
+          />
           {error ? (
             <p className="text-sm text-red-600" role="alert">
               {error}
             </p>
           ) : null}
-          <button
-            type="submit"
-            disabled={busy}
-            className="w-full rounded-lg bg-green-600 py-2.5 text-sm font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
+          <Button type="submit" variant="primary" className="w-full py-2.5" disabled={busy}>
             {busy ? "Création…" : "S’inscrire"}
-          </button>
+          </Button>
         </form>
 
         <p className="mt-6 text-center text-sm">

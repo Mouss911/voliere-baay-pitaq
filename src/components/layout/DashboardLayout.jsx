@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
+import { Loader } from "../ui";
 import { useAuth } from "../../context/AuthContext";
 import {
   useVoliere,
@@ -51,9 +52,7 @@ function DashboardOutlet() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <p className="text-sm text-gray-600">Chargement de la volière…</p>
-      </div>
+      <Loader fullScreen={false} message="Chargement de la volière…" className="min-h-[50vh]" />
     );
   }
 

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { FaBars, FaSignOutAlt } from "react-icons/fa";
 
+import { Button } from "../ui";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar({ onMenuClick }) {
@@ -37,15 +38,16 @@ export default function Navbar({ onMenuClick }) {
           </div>
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="nav"
           onClick={handleLogout}
-          className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-green-600 px-3 py-2 text-sm text-white sm:px-4 sm:text-base"
+          className="gap-2"
           aria-label="Déconnexion"
         >
           <FaSignOutAlt className="h-4 w-4 shrink-0" aria-hidden />
           <span className="hidden sm:inline">Logout</span>
-        </button>
+        </Button>
       </div>
     </header>
   );
