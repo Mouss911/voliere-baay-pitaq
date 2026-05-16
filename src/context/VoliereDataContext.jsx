@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { occupationResume } from "../data/mockData";
+import { occupationResume } from "../utils/cageHelpers";
 import { ensureUserSeeded } from "../firebase/seedDemoData";
 import {
   addCageDoc,

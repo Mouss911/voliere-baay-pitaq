@@ -39,21 +39,20 @@ export default function Dashboard() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-          Tableau de bord — Baay Pitàq
+          Tableau de bord - Baay Pitàq
         </h1>
         <p className="mt-2 text-gray-600">
-          Aperçu quotidien de la volière. Les chiffres proviennent de Cloud
-          Firestore (votre compte).
+          Aperçu quotidien de la volière.
         </p>
       </div>
 
-      <div
+      {/* <div
         className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
         role="status"
       >
         Données synchronisées en temps réel avec Firebase. La première connexion
         importe un jeu de démonstration dans votre espace.
-      </div>
+      </div> */}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Pigeons actifs / jeunes" value={pigeonsActifs} />

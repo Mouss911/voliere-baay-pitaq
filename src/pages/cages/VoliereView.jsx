@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import { Button, Modal } from "../../components/ui";
 import { useVoliere } from "../../context/VoliereDataContext";
-import { occupationCourt } from "../../data/mockData";
+import { occupationCourt } from "../../utils/cageHelpers";
 
 function cellClasses(type) {
   if (type === "libre")

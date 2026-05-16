@@ -7,6 +7,7 @@ export { ImageUpload } from "./ImageUpload.jsx";
 export { Input } from "./Input.jsx";
 export { Loader } from "./Loader.jsx";
 export { Modal } from "./Modal.jsx";
+export { PasswordInput } from "./PasswordInput.jsx";
 export {
   Table,
   TableBody,

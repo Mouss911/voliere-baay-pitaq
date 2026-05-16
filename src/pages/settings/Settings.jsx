@@ -8,28 +8,20 @@ const defaults = {
   nom: "",
   email: "",
   voliere: "",
-  ville: "",
-  fuseau: "Africa/Dakar",
-  uniteDistance: "km",
-  langue: "Français",
 };
 
-function buildForm(settings, userEmail) {
-  if (!settings) return { ...defaults };
+function buildForm(settings, userEmail, userName) {
+  if (!settings) return { ...defaults, email: userEmail ?? "", nom: userName ?? "" };
   return {
-    nom: settings.nom ?? "",
+    nom: settings.nom ?? userName ?? "",
     email: settings.email ?? userEmail ?? "",
     voliere: settings.voliere ?? "",
-    ville: settings.ville ?? "",
-    fuseau: settings.fuseau ?? defaults.fuseau,
-    uniteDistance: settings.uniteDistance ?? defaults.uniteDistance,
-    langue: settings.langue ?? defaults.langue,
   };
 }
 
-/** @param {{ settings: object | null; userEmail: string; saveSettings: (p: object) => Promise<void> }} props */
-function SettingsFormInner({ settings, userEmail, saveSettings }) {
-  const [form, setForm] = useState(() => buildForm(settings, userEmail));
+/** @param {{ settings: object | null; userEmail: string; userName?: string; saveSettings: (p: object) => Promise<void> }} props */
+function SettingsFormInner({ settings, userEmail, userName, saveSettings }) {
+  const [form, setForm] = useState(() => buildForm(settings, userEmail, userName));
   const [saving, setSaving] = useState(false);
 
   const handleChange = (field) => (e) => {
@@ -44,10 +36,6 @@ function SettingsFormInner({ settings, userEmail, saveSettings }) {
         nom: form.nom.trim(),
         email: form.email.trim() || userEmail || "",
         voliere: form.voliere.trim(),
-        ville: form.ville.trim(),
-        fuseau: form.fuseau.trim(),
-        uniteDistance: form.uniteDistance.trim(),
-        langue: form.langue.trim(),
       });
       toast.success("Paramètres enregistrés");
     } catch (err) {
@@ -75,6 +63,7 @@ function SettingsFormInner({ settings, userEmail, saveSettings }) {
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             />
           </label>
+
           <label className="block">
             <span className="text-sm font-medium text-gray-700">E-mail (profil)</span>
             <input
@@ -84,54 +73,15 @@ function SettingsFormInner({ settings, userEmail, saveSettings }) {
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             />
             <span className="mt-1 block text-xs text-gray-500">
-              Compte Firebase : {userEmail || "—"}
+              Compte connecté : {userEmail || "—"}
             </span>
           </label>
+
           <label className="block">
             <span className="text-sm font-medium text-gray-700">Volière</span>
             <input
               value={form.voliere}
               onChange={handleChange("voliere")}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Ville</span>
-            <input
-              value={form.ville}
-              onChange={handleChange("ville")}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
-          </label>
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-          Application
-        </h2>
-        <div className="mt-4 space-y-4">
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Fuseau horaire</span>
-            <input
-              value={form.fuseau}
-              onChange={handleChange("fuseau")}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Unité distance</span>
-            <input
-              value={form.uniteDistance}
-              onChange={handleChange("uniteDistance")}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-gray-700">Langue</span>
-            <input
-              value={form.langue}
-              onChange={handleChange("langue")}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             />
           </label>
@@ -165,12 +115,19 @@ export const Settings = () => {
         </p>
       </div>
 
-      <SettingsFormInner
-        key={formKey}
-        settings={settings}
-        userEmail={user?.email ?? ""}
-        saveSettings={saveSettings}
-      />
+      {!user ? (
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <p className="text-sm text-gray-600">Connectez-vous pour afficher et modifier vos paramètres.</p>
+        </div>
+      ) : (
+        <SettingsFormInner
+          key={formKey}
+          settings={settings}
+          userEmail={user?.email ?? ""}
+          userName={user?.nom ?? ""}
+          saveSettings={saveSettings}
+        />
+      )}
     </div>
   );
 };

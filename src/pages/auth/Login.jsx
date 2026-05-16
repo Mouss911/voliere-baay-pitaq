@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { Button, Input, Loader } from "../../components/ui";
+import { Button, Input, Loader, PasswordInput } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
 import { mapAuthError } from "../../firebase/authErrors";
 
@@ -64,10 +64,9 @@ export const Login = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Input
+          <PasswordInput
             label="Mot de passe"
             name="password"
-            type="password"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

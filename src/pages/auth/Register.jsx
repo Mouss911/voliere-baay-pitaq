@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { Button, Input, Loader } from "../../components/ui";
+import { Button, Input, Loader, PasswordInput } from "../../components/ui";
 import { useAuth } from "../../context/AuthContext";
 import { mapAuthError } from "../../firebase/authErrors";
 
@@ -77,18 +77,16 @@ export const Register = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Input
+          <PasswordInput
             label="Mot de passe"
             name="password"
-            type="password"
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Input
+          <PasswordInput
             label="Confirmer le mot de passe"
             name="password2"
-            type="password"
             autoComplete="new-password"
             value={password2}
             onChange={(e) => setPassword2(e.target.value)}

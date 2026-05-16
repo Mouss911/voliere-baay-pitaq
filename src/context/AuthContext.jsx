@@ -9,6 +9,7 @@ import {
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  reload,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
@@ -25,11 +26,13 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (fbUser) => {
       if (fbUser) {
+        const displayName = fbUser.displayName?.trim() || null;
         setUser({
           uid: fbUser.uid,
           email: fbUser.email ?? "",
+          displayName,
           nom:
-            fbUser.displayName?.trim() ||
+            displayName ||
             (fbUser.email ? fbUser.email.split("@")[0] : ""),
         });
       } else {
@@ -53,6 +56,7 @@ export function AuthProvider({ children }) {
     const name = displayName?.trim();
     if (name && cred.user) {
       await updateProfile(cred.user, { displayName: name });
+      await reload(cred.user);
     }
   }, []);
 

@@ -10,7 +10,11 @@ import {
   FaCog,
 } from "react-icons/fa";
 
+import { useAuth } from "../../context/AuthContext";
+
 export default function Sidebar({ mobileOpen = false, onMobileClose }) {
+  const { user } = useAuth();
+  const subtitle = user?.displayName || "Baay Pitàq";
   const links = [
     { name: "Dashboard", path: "/", icon: FaTachometerAlt },
     { name: "Pigeons", path: "/pigeons", icon: FaDove },
@@ -56,8 +60,8 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }) {
             <p className="text-lg font-bold leading-tight text-white sm:text-xl">
               Volière
             </p>
-            <p className="mt-0.5 text-sm font-normal leading-tight text-gray-400">
-              Baay Pitàq
+            <p className="mt-0.5 truncate text-sm font-normal leading-tight text-gray-400">
+              {subtitle}
             </p>
           </div>
         </header>
